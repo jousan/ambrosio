@@ -5,18 +5,28 @@ from commandlist import CommandList
 import channels as ch #ch is alias of channels
 import actions as ac
 import time
+import yaml
 
 class Ambrosio(object):
     """class for Ambrosio Personal Digital Butler will run our house"""
     def __init__(self):
             super(Ambrosio, self).__init__()
             self.cl = CommandList()
+
+            self._get_config() #els metodes per us intern tenen _davant
             self.channels = []
             self.channels.append(ch.TextChannel())
             self.channels.append(ch.TelegramChannel())
 
             self.actions = []
             self.actions.append(ac.MusicPlayer())
+
+    def _get_config(self):
+        with open ("ambrosio/ambrosio.yaml") as f:
+            self.cfg = yaml.load(f)
+
+            print "Configuracio: "
+            print json.dumps(self.cfg), indent=4)
 
 
     def next_command(self):
