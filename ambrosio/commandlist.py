@@ -5,8 +5,8 @@ class CommandList(object):
         super(CommandList, self).__init__()
         self.commands = []
 
-    def next(self): #next is the same that get_command
-        return self.commands.pop(0) #cua es afegir pel final i desplasar pel principi FIFO
+    def next(self):
+        return self.commands.pop(0)
 
     def append(self, command):
         self.commands.append(command)

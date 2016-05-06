@@ -2,10 +2,10 @@ from Channel import Channel
 
 class TextChannel(Channel):
     """Channel class, reads commands from file"""
-    def __init__(self, name="TextChannel"):
-        super(TextChannel, self).__init__(name)
-        self.messages=[]
-        with open("ambrosio/messages.txt","r") as f: #es fa f=open() i inclou f.close()
+    def __init__(self, cfg=None, name="TextChannel"):
+        super(TextChannel, self).__init__(cfg, name)
+        self.messages = []
+        with open("../messages.txt", "r") as f:
             for line in f:
                 self.messages.append(line)
 

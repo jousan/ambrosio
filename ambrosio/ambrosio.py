@@ -2,81 +2,81 @@
 # -*- coding: utf-8 -*-
 
 from commandlist import CommandList
-import channels as ch #ch is alias of channels
+import channels as ch
 import actions as ac
 import time
 import yaml
+import json
 
 class Ambrosio(object):
-    """class for Ambrosio Personal Digital Butler will run our house"""
+    """Class for Ambrosio Personal Digital Butler
+
+    Will run our house"""
     def __init__(self):
-            super(Ambrosio, self).__init__()
-            self.cl = CommandList()
+        super(Ambrosio, self).__init__()
+        self.cl = CommandList()
 
-            self._get_config() #els metodes per us intern tenen _davant
-            self.channels = []
-            self.channels.append(ch.TextChannel())
-            self.channels.append(ch.TelegramChannel())
+        self._get_config()
+        self.channels = []
+        c = ch.TextChannel(self.cfg)
+        self.channels.append(c)
+        self.channels.append(ch.TelegramChannel(self.cfg))
+        self.actions = []
+        self.actions.append(ac.MusicPlayer(self.cfg))
+        # self.actions.append(ac.SensorAction(self.cfg))
+        self.actions.append(ac.WakeAction(self.cfg))
 
-            self.actions = []
-            self.actions.append(ac.MusicPlayer())
 
     def _get_config(self):
-        with open ("ambrosio/ambrosio.yaml") as f:
+        with open("../ambrosio.yaml") as f:
             self.cfg = yaml.load(f)
 
-            print "Configuracio: "
-            print json.dumps(self.cfg), indent=4)
-
+        print "Configuracio: "
+        print json.dumps(self.cfg, indent=4)
 
     def next_command(self):
         try:
             return self.cl.next()
         except:
-            return None,None
+            return (None, None)
 
     def update_channels(self):
         for chan in self.channels:
             while chan.msg_avail():
                 self.cl.append((chan, chan.get_msg()))
-                 #canal i missage es una tuple
 
     def execute_command(self, command):
         print "Will execute", command
-        # for each action in actions
-        # if is_for_you()
-        # action.do
+        # Foreach Action in actions.
+        #   if is_for_you()
+        #       action.do
         words = command.split()
-        first_words = words[0]
-        rest_words = words[1:] #from position 1 until the end
+        first_word = words[0]
+        rest_words = words[1:]
         response = None
         for a in self.actions:
-            if a.is_for_you(first_words):
+            if a.is_for_you(first_word.lower()):
                 response = a.do(rest_words)
                 break
-        else:  #if there is no word after finishing the bucle, is the else form for
+        else:
             print "No t'entenc"
         return response
 
     def mainloop(self):
         # While True:
-        # command = get_command
-        # do_command(command)
-        # update
+        #   command = get_command
+        #   do_command(command)
+        #   update
         while True:
             chan, command = self.next_command()
             if command:
-                #print command
                 response = self.execute_command(command)
                 chan.respond(response)
 
             time.sleep(1)
             self.update_channels()
 
-
-
-
 if __name__ == "__main__":
     print "Here be dragons!"
-    amb=Ambrosio()
+    amb = Ambrosio()
     amb.mainloop()
